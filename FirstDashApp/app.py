@@ -65,8 +65,7 @@ app.layout = html.Div(
                         )
                     ]
                 ),
-            ],
-            style={'width': '50%'}
+            ]
         )
     ]
 )
