@@ -17,7 +17,7 @@ from apps import home
 from apps.movies import movies_home
 
 CONTENT_STYLE = {
-    "margin-top": "4em",
+    "margin-top": "1em",
     "margin-left": "1em",
     "margin-right": "1em",
     "padding": "1em 1em",

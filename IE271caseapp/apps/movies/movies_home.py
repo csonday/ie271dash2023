@@ -43,7 +43,7 @@ layout = html.Div(
                                 html.H4('Find Movies'),
                                 html.Div(
                                     dbc.Form(
-                                        dbc.FormGroup(
+                                        dbc.Row(
                                             [
                                                 dbc.Label("Search Title", width=1),
                                                 dbc.Col(
@@ -55,10 +55,10 @@ layout = html.Div(
                                                     width=5
                                                 )
                                             ],
-                                            row=True
                                         )
                                     )
                                 ),
+                                html.Br(),
                                 html.Div(
                                     "Table with movies will go here.",
                                     id='moviehome_movielist'
