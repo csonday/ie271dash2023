@@ -14,7 +14,7 @@ from app import app
 from apps import commonmodules as cm
 
 from apps import home
-
+from apps.movies import movies_home
 
 CONTENT_STYLE = {
     "margin-top": "4em",
@@ -59,7 +59,7 @@ def displaypage (pathname):
                 returnlayout = home.layout
 
             elif pathname == '/movies':
-                returnlayout = 'moviepage'
+                returnlayout = movies_home.layout
             else:
                 returnlayout = 'error404'
 
