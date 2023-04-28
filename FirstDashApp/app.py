@@ -32,7 +32,7 @@ app.layout = html.Div(
                                         type="text", id="input_value", placeholder="inputs please!",
                                         value=None
                                     ),
-                                    width=3,
+                                    width=5,
                                 ),
                             ],
                             className="mb-3",
@@ -49,26 +49,39 @@ app.layout = html.Div(
                                             dict(label='Palindrome Check', value=2),
                                             dict(label='Greeter', value=3),
                                         ],
-                                        style={'color':'black'}
+                                        style={'color': 'black'}
                                     ),
-                                    width=3,
+                                    width=5,
                                 ),
                             ],
                             className="mb-3",
                         ),
                         html.Br(),
-                        dbc.Button("Give me Stuff", color="secondary", className="me-1", id='confirm_process'),
+                        html.Div(
+                            dbc.Button("Give me Stuff", color="info", className="me-1", id='confirm_process'),
+                            className='d-grid gap-2'
+                        ), 
                         html.Hr(),
                         html.Div(
                             "No process yet", 
                             id='output_container',
-                            style={'border': '2px dashed #333', 'border-radius': '5px'}
+                            style={'border': '2px dashed #777', 'border-radius': '5px',
+                                   'padding': '1em'},
+                            className='text-center'
                         )
                     ]
                 ),
-            ]
+            ],
+            className='card text-white bg-dark mb-3'
         )
-    ]
+    ],
+    style={
+        'position': 'fixed',
+        'top': '50%',
+        'left': '50%',
+        'transform': 'translate(-50%, -50%)',
+        'width': '40%'
+    }
 )
 
 
