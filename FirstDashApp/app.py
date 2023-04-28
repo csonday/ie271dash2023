@@ -68,7 +68,12 @@ app.layout = html.Div(
             ],
             style={'width': '50%'}
         )
-    ]
+    ],style={
+        'position': 'absolute',
+        'transform': 'translate(0%, 50%)',
+        'width': '100%'
+    }
+
 )
 
 
