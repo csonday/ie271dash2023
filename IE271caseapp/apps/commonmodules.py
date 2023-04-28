@@ -21,7 +21,7 @@ navbar = dbc.Navbar(
             # Use row and col to control vertical alignment of logo / brand
             dbc.Row(
                 [
-                    dbc.Col(dbc.NavbarBrand("IE 156 Case App", className="ml-2")),
+                    dbc.Col(dbc.NavbarBrand("IE 271 Case App", className="ml-2")),
                 ],
                 align="center",
                 className='g-0' # remove gutters (i.e. horizontal space between cols)
