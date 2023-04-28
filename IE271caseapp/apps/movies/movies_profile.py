@@ -6,6 +6,7 @@ import dash
 from dash.exceptions import PreventUpdate
 from dash.dependencies import Input, Output, State
 import pandas as pd
+from urllib.parse import urlparse, parse_qs
 
 # Let us import the app object in case we need to define
 # callbacks here
@@ -16,6 +17,12 @@ from apps import dbconnect as db
 # store the layout objects into a variable named layout
 layout = html.Div(
     [
+        html.Div( # This div shall contain all dcc.Store objects
+            [
+                dcc.Store(id='movieprofile_toload', storage_type='memory', data=0),
+            ]
+        ),
+
         html.H2('Movie Details'), # Page Header
         html.Hr(),
         dbc.Alert(id='movieprofile_alert', is_open=False), # For feedback purposes
@@ -96,38 +103,39 @@ layout = html.Div(
 
 @app.callback(
     [
-        # The property of the dropdown we wish to update is the
-        # 'options' property
-        Output('movieprofile_genre', 'options')
+        Output('movieprofile_genre', 'options'),
+        Output('movieprofile_toload', 'data'),
     ],
     [
         Input('url', 'pathname')
+    ],
+    [
+        State('url', 'search') # add this search component to the State
     ]
 )
-def movieprofile_populategenres(pathname):
+def movieprof_loaddropdown(pathname, search):
+    
     if pathname == '/movies/movies_profile':
         sql = """
-        SELECT genre_name as label, genre_id as value
-        FROM genres 
-        WHERE genre_delete_ind = False
+            SELECT genre_name as label, genre_id as value
+            FROM genres
+            WHERE genre_delete_ind = False
         """
         values = []
         cols = ['label', 'value']
-
         df = db.querydatafromdatabase(sql, values, cols)
-        # The output must be a dictionary with the following structure
-        # options=[
-        #     {'label': "Factorial", 'value': 1},
-        #     {'label': "Palindrome Checker", 'value': 2},
-        #     {'label': "Greeter", 'value': 3},
-        # ]
-
-        genre_options = df.to_dict('records')
-        return [genre_options]
+        genre_opts = df.to_dict('records')
+        
+        # are we on add or edit mode?
+        parsed = urlparse(search)
+        create_mode = parse_qs(parsed.query)['mode'][0]
+        to_load = 1 if create_mode == 'edit' else 0
+    
     else:
-        # If the pathname is not the desired,
-        # this callback does not execute
         raise PreventUpdate
+
+    return [genre_opts, to_load]
+
 
 
 
@@ -151,9 +159,11 @@ def movieprofile_populategenres(pathname):
         State('movieprofile_title', 'value'),
         State('movieprofile_genre', 'value'),
         State('movieprofile_releasedate', 'date'),
+        State('url', 'search'), # we need this to identify which mode we are in
     ]
 )
-def movieprofile_saveprofile(submitbtn, title, genre, releasedate):
+def movieprofile_saveprofile(submitbtn, title, genre, releasedate,
+                             search):
     ctx = dash.callback_context
     # The ctx filter -- ensures that only a change in url will activate this callback
     if ctx.triggered:
@@ -182,24 +192,85 @@ def movieprofile_saveprofile(submitbtn, title, genre, releasedate):
                 alert_color = 'danger'
                 alert_text = 'Check your inputs. Please supply the movie release date.'
             else: # all inputs are valid
-                # Add the data into the db
 
-                sql = '''
-                    INSERT INTO movies (movie_name, genre_id,
-                        movie_release_date, movie_delete_ind)
-                    VALUES (%s, %s, %s, %s)
-                '''
-                values = [title, genre, releasedate, False]
+                # parse or decode the 'mode' portion of the search queries 
+                parsed = urlparse(search)
+                create_mode = parse_qs(parsed.query)['mode'][0]
 
-                db.modifydatabase(sql, values)
+                if create_mode == 'add':
+                    # Add the data into the db
+                    # save to db
 
-                # If this is successful, we want the successmodal to show
-                modal_open = True
+                    sql = '''
+                        INSERT INTO movies (movie_name, genre_id,
+                            movie_release_date, movie_delete_ind)
+                        VALUES (%s, %s, %s, %s)
+                    '''
+                    values = [title, genre, releasedate, False]
+
+                    db.modifydatabase(sql, values)
+
+                    # If this is successful, we want the successmodal to show
+                    modal_open = True
+
+                elif create_mode == 'edit':
+                    # we define this later
+                    pass
 
             return [alert_color, alert_text, alert_open, modal_open]
 
         else: # Callback was not triggered by desired triggers
             raise PreventUpdate
+
+    else:
+        raise PreventUpdate
+
+
+@app.callback(
+    [
+        # Our goal is to update values of these fields
+        Output('movieprofile_title', 'value'),
+        Output('movieprofile_genre', 'value'),
+        Output('movieprofile_releasedate', 'date'),
+    ],
+    [
+        # Our trigger is if the dcc.Store object changes its value
+        # This is how you check a change in value for a dcc.Store
+        Input('movieprofile_toload', 'modified_timestamp')
+    ],
+    [
+        # We need the following to proceed
+	    # Note that the value of the dcc.Store object is in
+	    # the ‘data’ property, and not in the ‘modified_timestamp’ property
+        State('movieprofile_toload', 'data'),
+        State('url', 'search'),
+    ]
+)
+def movieprofile_loadprofile(timestamp, toload, search):
+    if toload: # check if toload = 1
+        
+        # Get movieid value from the search parameters
+        parsed = urlparse(search)
+        movieid = parse_qs(parsed.query)['id'][0]
+
+        # Query from db
+        sql = """
+            SELECT movie_name, genre_id, movie_release_date
+            FROM movies
+            WHERE movie_id = %s
+        """
+        values = [movieid]
+        col = ['moviename', 'genreid', 'releasedate']
+
+        df = db.querydatafromdatabase(sql, values, col)
+
+        moviename = df['moviename'][0]
+        # Our dropdown list has the genreids as values then it will 
+        # display the correspoinding labels
+        genreid = int(df['genreid'][0])
+        releasedate = df['releasedate'][0]
+
+        return [moviename, genreid, releasedate]
 
     else:
         raise PreventUpdate

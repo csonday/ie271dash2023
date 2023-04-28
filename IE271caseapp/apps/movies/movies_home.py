@@ -6,6 +6,7 @@ import dash
 from dash.exceptions import PreventUpdate
 from dash.dependencies import Input, Output, State
 import pandas as pd
+from urllib.parse import urlparse, parse_qs
 
 # Let us import the app object in case we need to define
 # callbacks here
@@ -33,7 +34,7 @@ layout = html.Div(
                                 # hyperlink that leads to another page
                                 dbc.Button(
                                     "Add Movie",
-                                    href='/movies/movies_profile'
+                                    href='/movies/movies_profile?mode=add'
                                 )
                             ]
                         ),
@@ -83,18 +84,18 @@ layout = html.Div(
     ]
 )
 def moviehome_loadmovielist(pathname, searchterm):
-    print(pathname)
     if pathname == '/movies':
         # 1. Obtain records from the DB via SQL
         # 2. Create the html element to return to the Div
-        sql = """ SELECT movie_name, genre_name
+        sql = """ SELECT movie_name, genre_name, movie_id
             FROM movies m
                 INNER JOIN genres g ON m.genre_id = g.genre_id
             WHERE 
                 NOT movie_delete_ind
+
         """
         values = [] # blank since I do not have placeholders in my SQL
-        cols = ['Movie Title', 'Genre']
+        cols = ['Movie Title', 'Genre', 'ID']
         
         
         ### ADD THIS IF BLOCK
@@ -110,6 +111,21 @@ def moviehome_loadmovielist(pathname, searchterm):
         df = db.querydatafromdatabase(sql, values, cols)
         
         if df.shape: # check if query returned anything
+            buttons = []
+            for movie_id in df['ID']:
+                buttons += [
+                    html.Div(
+                        dbc.Button('Edit', href=f'movies/movies_profile?mode=edit&id={movie_id}',
+                                   size='sm', color='warning'),
+                        style={'text-align': 'center'}
+                    )
+                ]
+            
+            df['Action'] = buttons
+            
+            # remove the column ID before turning into a table 
+            df = df[['Movie Title', 'Genre', 'Action']]
+
             table = dbc.Table.from_dataframe(df, striped=True, bordered=True,
                     hover=True, size='sm')
             return [table]
