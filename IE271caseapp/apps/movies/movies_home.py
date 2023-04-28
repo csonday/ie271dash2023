@@ -55,10 +55,10 @@ layout = html.Div(
                                                     width=5
                                                 )
                                             ],
+                                            className='mb-3' # add 1em bottom margin
                                         )
                                     )
                                 ),
-                                html.Br(),
                                 html.Div(
                                     "Table with movies will go here.",
                                     id='moviehome_movielist'

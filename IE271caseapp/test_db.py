@@ -1,4 +1,4 @@
-import dbconnect as db
+import apps.dbconnect as db
 from datetime import datetime
 
 def addfewgenres():
@@ -31,7 +31,7 @@ def addfewgenres():
     print('done!')
     
 
-addfewgenres()
+# addfewgenres()
 
 # querydatafromdatabase(sql, values, dfcolumns)
 sql = 'SELECT * FROM genres'
@@ -42,8 +42,8 @@ print(db.querydatafromdatabase(sql, values, colnames))
 
 
 
-# sql_resetgenres = """
-#     TRUNCATE TABLE genres RESTART IDENTITY CASCADE
-# """
-# db.modifydatabase(sql_resetgenres, [])  
-# addfewgenres()
+sql_resetgenres = """
+    TRUNCATE TABLE genres RESTART IDENTITY CASCADE
+"""
+db.modifydatabase(sql_resetgenres, [])  
+addfewgenres()
