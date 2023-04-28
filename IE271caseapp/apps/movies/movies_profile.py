@@ -73,7 +73,33 @@ layout = html.Div(
 
             ]
         ),
-          dbc.Button(
+        # enclosing the checklist in a Div so we can
+        # hide it in Add Mode
+        html.Div(
+            dbc.Row(
+                [
+                    dbc.Label("Wish to delete?", width=2),
+                    dbc.Col(
+                        dbc.Checklist(
+                            id='movieprofile_removerecord',
+                            options=[
+                                {
+                                    'label': "Mark for Deletion",
+                                    'value': 1
+                                }
+                            ],
+                            # I want the label to be bold
+                            style={'fontWeight':'bold'}, 
+                        ),
+                        width=6,
+                    ),
+                ],
+                className="mb-3",
+            ),
+            id='movieprofile_removerecord_div'
+        ),
+
+        dbc.Button(
             'Submit',
             id='movieprofile_submit',
             n_clicks=0 # Initialize number of clicks
@@ -105,6 +131,7 @@ layout = html.Div(
     [
         Output('movieprofile_genre', 'options'),
         Output('movieprofile_toload', 'data'),
+        Output('movieprofile_removerecord_div', 'style'),
     ],
     [
         Input('url', 'pathname')
@@ -130,11 +157,17 @@ def movieprof_loaddropdown(pathname, search):
         parsed = urlparse(search)
         create_mode = parse_qs(parsed.query)['mode'][0]
         to_load = 1 if create_mode == 'edit' else 0
+
+        # to show the remove option?
+
+        removediv_style = {'display': 'none'} if not to_load else None
+        # if to_load = 0, then not to_load -> not 0 -> not False -> True
+
     
     else:
         raise PreventUpdate
 
-    return [genre_opts, to_load]
+    return [genre_opts, to_load, removediv_style]
 
 
 
@@ -160,10 +193,11 @@ def movieprof_loaddropdown(pathname, search):
         State('movieprofile_genre', 'value'),
         State('movieprofile_releasedate', 'date'),
         State('url', 'search'), # we need this to identify which mode we are in
+        State('movieprofile_removerecord', 'value'),
     ]
 )
 def movieprofile_saveprofile(submitbtn, title, genre, releasedate,
-                             search):
+                             search, removerecord):
     ctx = dash.callback_context
     # The ctx filter -- ensures that only a change in url will activate this callback
     if ctx.triggered:
@@ -209,13 +243,32 @@ def movieprofile_saveprofile(submitbtn, title, genre, releasedate,
                     values = [title, genre, releasedate, False]
 
                     db.modifydatabase(sql, values)
+                    
+
+                elif create_mode == 'edit':
+                    # 1. we need to get the movieid to update
+                    parsed = urlparse(search)
+                    movieid = parse_qs(parsed.query)['id'][0]
+
+                    # 2. we need to update the db
+                    sqlcode = """UPDATE movies
+                    SET
+                        movie_name = %s,
+                        genre_id = %s,
+                        movie_release_date  = %s,
+                        movie_delete_ind = %s
+                    WHERE
+                        movie_id = %s
+                    """
+                    to_delete = bool(removerecord)
+                    values = [title, genre, releasedate, to_delete,
+                              movieid]
+
+                    db.modifydatabase(sqlcode, values)
 
                     # If this is successful, we want the successmodal to show
                     modal_open = True
 
-                elif create_mode == 'edit':
-                    # we define this later
-                    pass
 
             return [alert_color, alert_text, alert_open, modal_open]
 
