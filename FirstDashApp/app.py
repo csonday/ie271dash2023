@@ -32,7 +32,7 @@ app.layout = html.Div(
                                         type="text", id="input_value", placeholder="inputs please!",
                                         value=None
                                     ),
-                                    width=5,
+                                    width=3,
                                 ),
                             ],
                             className="mb-3",
@@ -48,39 +48,27 @@ app.layout = html.Div(
                                             dict(label='Factorial', value=1),
                                             dict(label='Palindrome Check', value=2),
                                             dict(label='Greeter', value=3),
-                                        ]
+                                        ],
+                                        style={'color':'black'}
                                     ),
-                                    width=5,
+                                    width=3,
                                 ),
                             ],
                             className="mb-3",
                         ),
                         html.Br(),
-                        html.Div(
-                            dbc.Button("Give me Stuff", color="info", className="me-1", id='confirm_process'),
-                            className='d-grid gap-2'
-                        ), 
+                        dbc.Button("Give me Stuff", color="secondary", className="me-1", id='confirm_process'),
                         html.Hr(),
                         html.Div(
                             "No process yet", 
                             id='output_container',
-                            style={'border': '2px dashed #777', 'border-radius': '5px',
-                                   'padding': '1em'},
-                            className='text-center'
+                            style={'border': '2px dashed #333', 'border-radius': '5px'}
                         )
                     ]
                 ),
-            ],
-            className='card text-white bg-dark mb-3'
+            ]
         )
-    ],
-    style={
-        'position': 'fixed',
-        'top': '50%',
-        'left': '50%',
-        'transform': 'translate(-50%, -50%)',
-        'width': '40%'
-    }
+    ]
 )
 
 
