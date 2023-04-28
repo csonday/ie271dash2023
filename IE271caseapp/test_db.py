@@ -24,13 +24,14 @@ def addfewgenres():
         genre_modified_date, 
         genre_delete_ind
     )
-    VALUES (%s)"""
+    VALUES (%s, %s, %s)"""
     db.modifydatabase(sqlcode2, ['Horror', datetime.now(), False])
 
     # Just some feedback that the code succeeded
     print('done!')
     
 
+addfewgenres()
 
 # querydatafromdatabase(sql, values, dfcolumns)
 sql = 'SELECT * FROM genres'
@@ -41,8 +42,8 @@ print(db.querydatafromdatabase(sql, values, colnames))
 
 
 
-sql_resetgenres = """
-    TRUNCATE TABLE genres RESTART IDENTITY CASCADE
-"""
-db.modifydatabase(sql_resetgenres, [])  
-addfewgenres()
+# sql_resetgenres = """
+#     TRUNCATE TABLE genres RESTART IDENTITY CASCADE
+# """
+# db.modifydatabase(sql_resetgenres, [])  
+# addfewgenres()
