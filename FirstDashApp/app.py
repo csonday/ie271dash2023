@@ -9,7 +9,7 @@ from dash.exceptions import PreventUpdate
 import casefunctions
 
 
-app = dash.Dash(__name__, external_stylesheets = ['assets/bootstrap.css'])
+app = dash.Dash(__name__, external_stylesheets = ['assets/bootstrap.css', dbc.themes.BOOTSTRAP])
 app.title = 'First Dash App'
 
 app.layout = html.Div(
