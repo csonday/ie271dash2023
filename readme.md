@@ -1,3 +1,12 @@
+# Login and Signup Pages
+
+- [Login and Signup Pages](#login-and-signup-pages)
+- [Setup your db for Login Credentials](#setup-your-db-for-login-credentials)
+- [Create the login page](#create-the-login-page)
+- [Create the signup page](#create-the-signup-page)
+- [Setup the index.py](#setup-the-indexpy)
+- [Add logout link to the navbar](#add-logout-link-to-the-navbar)
+
 
 # Setup your db for Login Credentials
 * Add your table for users
