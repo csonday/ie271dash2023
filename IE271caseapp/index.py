@@ -31,7 +31,7 @@ app.layout = html.Div(
         # LOGIN DATA
         # 1) logout indicator, storage_type='session' means that data will be retained
         #  until browser/tab is closed (vs clearing data upon refresh)
-        dcc.Store(id='sessionlogout', data=False, storage_type='session'),
+        dcc.Store(id='sessionlogout', data=True, storage_type='session'),
         
         # 2) current_user_id -- stores user_id
         dcc.Store(id='currentuserid', data=-1, storage_type='session'),
@@ -44,7 +44,7 @@ app.layout = html.Div(
         html.Div(
             cm.navbar,
             id='navbar_div'
-        )
+        ),
 
         # Page Content -- Div that contains page layout
         html.Div(id='page-content', style=CONTENT_STYLE),
@@ -106,7 +106,15 @@ def displaypage (pathname,
 
             else:
                 returnlayout = '404: request not found'
-
+                
+        # decide sessionlogout value
+        logout_conditions = [
+            pathname in ['/', '/logout'],
+            userid == -1,
+            not userid
+        ]
+        sessionlogout = any(logout_conditions)
+        
         # hide navbar if logged-out; else, set class/style to default
         navbar_classname = 'd-none' if sessionlogout else ''
         

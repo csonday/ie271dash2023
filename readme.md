@@ -12,10 +12,14 @@
 # Create the login page
 
 * See `IE271caseapp/apps/login.py` for the layout
+  * Use `type='password'` for `dbc.Input` to hide texts in passwords
 * It looks like movieprofile in this case but you can always design it differently
 * Check the callback for the login process
   * Querying the credentials into the database
   * Using a hash on the password before checking credentials
+  * If trigger is...
+    * login button -- query if the credentials are in the db
+    * logout (via `sessionlogout` variable) -- reset the session variables to values that correspond to logging out
 
 # Create the signup page
 
@@ -36,12 +40,16 @@
 # Setup the index.py
 
 1. Go to index.py.
-2. Add `dcc.Store` to save login credentials (i.e. details necessary during the session)
+2. Add `dcc.Store` elements to save login credentials (i.e. details necessary during the session)
    * `sessionlogout` -- bool, indicator on whether the session is logged-in or not
    * `currentuserid` -- int, stores the user_id of the current user; if logged-out, has a value -1
    * `currentrole` -- int, stores the role_id (if any) of the current user; if logged_out, has a value of -1
 3. Put the `Navbar` inside a `Div` so we can hide it when the user is not logged in
 4. Edit the callback to add `login.py` and `signup.py`
+   1. Note how login-states are checked prior to routing to the correct pages
+      * `login` and `signup` pages are only accessible if the user is not signed in (i.e. session userid = -1)
+   2. The `sessionlogout` variable, bool, is decided based on various indicators for login-status.
+   3. The navbar is hidden (or shown) based on the value of `sessionlogout`.
 
 
 # Add logout link to the navbar
